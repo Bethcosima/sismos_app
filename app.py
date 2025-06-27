@@ -25,6 +25,7 @@ def crear_mapa(df):
 
 df = cargar_datos()
 if 'mapa' not in st.session_state:
+    st.write("creando mapa...") #debug temporal
     st.session_state.mapa = crear_mapa(df)
 
 #Prediccion (inputs, botones, pipelines)
@@ -77,6 +78,10 @@ if prediccion_hecha:
         icon = folium.Icon(color='green', icon= 'info-sign')
     ).add_to(st.session_state.mapa)
 
+
 #mostrar en streamlit
 with st.expander("🗺️ Mapa Histórico de sismos en CDMX", expanded=True):
-    st_folium(st.session_state.mapa, width=700, height= 500, return_on_move=False)
+    try:
+        st_folium(st.session_state.mapa, width=700, height= 500)
+    except Exception as e:
+        st.error(f"Error al mostrar el mapa: {e}")
