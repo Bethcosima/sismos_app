@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-pipeline = joblib.load('Data\modelo_sismos.pkl')
+pipeline = joblib.load('Data\\modelo_sismos.pkl')
 
 st.title("Predicción de Magnitud de los Sismos en CDMX")
 
