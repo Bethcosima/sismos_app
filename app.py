@@ -19,6 +19,10 @@ latitud = st.number_input("Latitud", value= 19.36)
 longitud = st.number_input("Longitud", value= -99.2)
 profundidad = st.number_input("Profundidad (km)", value= 1.0)
 
+#contenedor para resultado
+resultado = st.empty(
+
+)
 if st.button("Predecir magnitud"):
     entrada = pd.DataFrame([{
         'Año': anio,
@@ -32,7 +36,7 @@ if st.button("Predecir magnitud"):
     }])
 
     pred = pipeline.predict(entrada)[0]
-    st.success(f"Magnitud estimada: {pred:.2f}")
+    resultado.success(f"Magnitud estimada: {pred:.2f}")
 
 # Mostramos el mapa con datos reales
 
@@ -60,4 +64,4 @@ for _,row in df.iterrows():
     ).add_to(mapa)
 
 #mostrar en streamlit
-st_data = st_folium(mapa, width=700, height= 500)
+st_folium(mapa, width=700, height= 500)
