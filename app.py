@@ -43,37 +43,37 @@ if st.button("Predecir magnitud"):
 
 # Mostramos el mapa con datos reales
 
-st.subheader("🗺️ Mapa Histórico de sismos en CDMX")
+with st.expander("🗺️ Mapa Histórico de sismos en CDMX", expanded=True):
 
 
-#cargamos dataset limpio
+    #cargamos dataset limpio
 
-df= pd.read_csv('Data/sismos_cdmx_cleanData.csv')
+    df= pd.read_csv('Data/sismos_cdmx_cleanData.csv')
 
-#crear mapa centrado en CDMX
+    #crear mapa centrado en CDMX
 
-mapa = folium.Map(location= [19.36,-99.13], zoom_start= 10)
+    mapa = folium.Map(location= [19.36,-99.13], zoom_start= 10)
 
-#añadimos puntos al mapa
+    #añadimos puntos al mapa
 
-for _,row in df.iterrows():
-    folium.CircleMarker(
-        location=[row['Latitud'], row['Longitud']],
-        radius = 3,
-        popup = f"{row['Fecha']} - M{row['Magnitud']:.1f}",
-        color = 'red' if row['Magnitud'] >=2 else 'blue',
-        fill= True,
-        fill_opacity = 0.7
+    for _,row in df.iterrows():
+        folium.CircleMarker(
+            location=[row['Latitud'], row['Longitud']],
+            radius = 3,
+            popup = f"{row['Fecha']} - M{row['Magnitud']:.1f}",
+            color = 'red' if row['Magnitud'] >=2 else 'blue',
+            fill= True,
+            fill_opacity = 0.7
 
-    ).add_to(mapa)
+        ).add_to(mapa)
 
-# si hay una prediccion, agregamos el punto del usuario
-if prediccion_hecha:
-    folium.Marker(
-        location = [latitud, longitud],
-        popup= f"Prediccion: M{magnitud_predicha:.2f}",
-        icon = folium.Icon(color='green', icon= 'info-sign')
-    ).add_to(mapa)
-    
-#mostrar en streamlit
-st_folium(mapa, width=700, height= 500)
+    # si hay una prediccion, agregamos el punto del usuario
+    if prediccion_hecha:
+        folium.Marker(
+            location = [latitud, longitud],
+            popup= f"Prediccion: M{magnitud_predicha:.2f}",
+            icon = folium.Icon(color='green', icon= 'info-sign')
+        ).add_to(mapa)
+
+    #mostrar en streamlit
+    st_folium(mapa, width=700, height= 500, return_on_move=False)
