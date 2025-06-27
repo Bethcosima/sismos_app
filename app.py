@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import folium
+from streamlit_folium import st_folium
 
 pipeline = joblib.load('modelo_sismos.pkl')
 
@@ -31,3 +33,31 @@ if st.button("Predecir magnitud"):
 
     pred = pipeline.predict(entrada)[0]
     st.success(f"Magnitud estimada: {pred:.2f}")
+
+# Mostramos el mapa con datos reales
+
+st.subheader("Mapa Histórico de sismos en CDMX")
+
+#cargamos dataset limpio
+
+df= pd.read_csv('Data\\sismos_cdmx_cleanData.csv')
+
+#crear mapa centrado en CDMX
+
+mapa = folium.Map(location= [19.36,-99.13], zoom_start= 10)
+
+#añadimos puntos al mapa
+
+for _,row in df.iterrows():
+    folium.CircleMarker(
+        location=[row['Latitud'], row['Longitud']],
+        radius = 3,
+        popup = f"{row['Fecha']} - M{row['Magnitud']:.1f}",
+        color = 'red' if row['Magnitud'] >=2 else 'blue',
+        fill= True,
+        fill_opacity = 0.7
+
+    ).add_to(mapa)
+
+#mostrar en streamlit
+st_data = st_folium(mapa, with=700, height= 500)
