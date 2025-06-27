@@ -9,6 +9,7 @@ pipeline = joblib.load('modelo_sismos.pkl')
 st.title("Predicción de Magnitud de los Sismos en CDMX")
 
 #inputs del usuario
+st.header("Ingresa los datos del sismo")
 
 anio = st.number_input("Año", 1900,2100,2025)
 mes = st.selectbox("Mes", list(range(1,13)))
@@ -20,9 +21,10 @@ longitud = st.number_input("Longitud", value= -99.2)
 profundidad = st.number_input("Profundidad (km)", value= 1.0)
 
 #contenedor para resultado
-resultado = st.empty(
+resultado = st.empty()
+prediccion_hecha = False
+magnitud_predicha = None
 
-)
 if st.button("Predecir magnitud"):
     entrada = pd.DataFrame([{
         'Año': anio,
@@ -35,12 +37,14 @@ if st.button("Predecir magnitud"):
         'Profundidad': profundidad
     }])
 
-    pred = pipeline.predict(entrada)[0]
-    resultado.success(f"Magnitud estimada: {pred:.2f}")
+    magnitud_predicha = pipeline.predict(entrada)[0]
+    resultado.success(f"Magnitud estimada: {magnitud_predicha:.2f}")
+    prediccion_hecha = True
 
 # Mostramos el mapa con datos reales
 
-st.subheader("Mapa Histórico de sismos en CDMX")
+st.subheader("🗺️ Mapa Histórico de sismos en CDMX")
+
 
 #cargamos dataset limpio
 
@@ -63,5 +67,13 @@ for _,row in df.iterrows():
 
     ).add_to(mapa)
 
+# si hay una prediccion, agregamos el punto del usuario
+if prediccion_hecha:
+    folium.Marker(
+        location = [latitud, longitud],
+        popup= f"Prediccion: M{magnitud_predicha:.2f}",
+        icon = folium.Icon(color='green', icon= 'info-sign')
+    ).add_to(mapa)
+    
 #mostrar en streamlit
 st_folium(mapa, width=700, height= 500)
