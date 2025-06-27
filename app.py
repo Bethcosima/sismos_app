@@ -60,4 +60,4 @@ for _,row in df.iterrows():
     ).add_to(mapa)
 
 #mostrar en streamlit
-st_data = st_folium(mapa, with=700, height= 500)
+st_data = st_folium(mapa, width=700, height= 500)
