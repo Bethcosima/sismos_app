@@ -1,0 +1,7 @@
+*.pyc
+__pycache__/
+# ignora configuraciones del editor
+.vscode/
+
+#ignora carpetas de datos pesados
+data/SSNMX.csv
