@@ -4,6 +4,30 @@ import joblib
 import folium
 from streamlit_folium import st_folium
 
+#cargamos dataset limpio
+@st.cache_data
+def cargar_datos():
+    
+    return pd.read_csv('Data/sismos_cdmx_cleanData.csv')
+
+def crear_mapa(df):
+    mapa = folium.Map(location= [19.36, -99.13], zoom_start=10)
+    for _, row in df.iterrows():
+        folium.CircleMarker(
+            location = [row['Latitud'], row['Longitud']],
+            radius= 3,
+            popup= f"{row['Fecha']} - M{row['Magnitud']:.1f}",
+            color = 'red' if row['Magnitud'] >=2 else 'blue',
+            fill = True,
+            fill_opacity = 0.7
+        ).add_to(mapa)
+    return mapa
+
+df = cargar_datos()
+if 'mapa' not in st.session_state:
+    st.session_state.mapa = crear_mapa(df)
+
+#Prediccion (inputs, botones, pipelines)
 pipeline = joblib.load('modelo_sismos.pkl')
 
 st.title("Predicción de Magnitud de los Sismos en CDMX")
@@ -21,9 +45,9 @@ longitud = st.number_input("Longitud", value= -99.2)
 profundidad = st.number_input("Profundidad (km)", value= 1.0)
 
 #contenedor para resultado
-resultado = st.empty()
 prediccion_hecha = False
 magnitud_predicha = None
+resultado = st.empty()
 
 if st.button("Predecir magnitud"):
     entrada = pd.DataFrame([{
@@ -43,37 +67,16 @@ if st.button("Predecir magnitud"):
 
 # Mostramos el mapa con datos reales
 
+
+
+# si hay una prediccion, agregamos el punto del usuario
+if prediccion_hecha:
+    folium.Marker(
+        location = [latitud, longitud],
+        popup= f"Prediccion: M{magnitud_predicha:.2f}",
+        icon = folium.Icon(color='green', icon= 'info-sign')
+    ).add_to(st.session_state.mapa)
+
+#mostrar en streamlit
 with st.expander("🗺️ Mapa Histórico de sismos en CDMX", expanded=True):
-
-
-    #cargamos dataset limpio
-
-    df= pd.read_csv('Data/sismos_cdmx_cleanData.csv')
-
-    #crear mapa centrado en CDMX
-
-    mapa = folium.Map(location= [19.36,-99.13], zoom_start= 10)
-
-    #añadimos puntos al mapa
-
-    for _,row in df.iterrows():
-        folium.CircleMarker(
-            location=[row['Latitud'], row['Longitud']],
-            radius = 3,
-            popup = f"{row['Fecha']} - M{row['Magnitud']:.1f}",
-            color = 'red' if row['Magnitud'] >=2 else 'blue',
-            fill= True,
-            fill_opacity = 0.7
-
-        ).add_to(mapa)
-
-    # si hay una prediccion, agregamos el punto del usuario
-    if prediccion_hecha:
-        folium.Marker(
-            location = [latitud, longitud],
-            popup= f"Prediccion: M{magnitud_predicha:.2f}",
-            icon = folium.Icon(color='green', icon= 'info-sign')
-        ).add_to(mapa)
-
-    #mostrar en streamlit
-    st_folium(mapa, width=700, height= 500, return_on_move=False)
+    st_folium(st.session_state.mapa, width=700, height= 500, return_on_move=False)
