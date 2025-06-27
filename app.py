@@ -40,7 +40,7 @@ st.subheader("Mapa Histórico de sismos en CDMX")
 
 #cargamos dataset limpio
 
-df= pd.read_csv('Data\\sismos_cdmx_cleanData.csv')
+df= pd.read_csv('Data/sismos_cdmx_cleanData.csv')
 
 #crear mapa centrado en CDMX
 
